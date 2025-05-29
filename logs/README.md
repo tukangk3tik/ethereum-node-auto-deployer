@@ -1,0 +1,1 @@
+This directory is used to store logs of geth node from docker compose.

@@ -1,0 +1,16 @@
+#SPDX-License-Identifier: MIT-0
+---
+# vars file for roles/deploy_geth_node
+# These are more static variables that typically don't need to be overridden
+
+# Required dependencies
+required_packages:
+  - docker-ce
+  - docker-ce-cli
+  - containerd.io
+
+# Network definitions
+geth_networks:
+  mainnet: ""
+  sepolia: "--sepolia"
+  goerli: "--goerli"

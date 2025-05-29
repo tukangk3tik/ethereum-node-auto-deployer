@@ -1,0 +1,118 @@
+
+# Skipping docker setup
+# Ensure the docker was installed in remote host
+- name: Create Ethereum data directory
+  file:
+    path: "{{ geth_data_dir }}"
+    state: directory
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0755'
+
+- name: Check if Geth container is already running
+  docker_container_info:
+    name: "{{ geth_container_name }}"
+  register: geth_container_info
+  ignore_errors: yes
+
+- name: Stop existing Geth container if running
+  docker_container:
+    name: "{{ geth_container_name }}"
+    state: stopped
+  when: geth_container_info.exists and geth_container_info.container.State.Status == "running"
+
+- name: Remove existing Geth container if exists
+  docker_container:
+    name: "{{ geth_container_name }}"
+    state: absent
+  when: geth_container_info.exists
+
+- name: Pull Geth Docker image
+  docker_image:
+    name: "{{ geth_image }}"
+    source: pull
+    tag: "{{ geth_tag }}"
+
+- name: Run Geth node container
+  docker_container:
+    name: "{{ geth_container_name }}"
+    image: "{{ geth_image }}:{{ geth_tag }}"
+    state: started
+    restart_policy: always
+    ports:
+      - "{{ geth_p2p_port }}:30303"
+      - "{{ geth_p2p_port }}:30303/udp"
+      - "{{ geth_http_port if geth_enable_public_access else '127.0.0.1:' + geth_http_port|string }}:8545"
+      - "{{ geth_ws_port if geth_enable_public_access else '127.0.0.1:' + geth_ws_port|string }}:8546"
+    volumes:
+      - "{{ geth_data_dir }}:/root/.ethereum"
+    command: >
+      --syncmode {{ geth_sync_mode }}
+      --state.scheme path
+      --cache {{ geth_cache_size }}
+      --maxpeers {{ geth_max_peers }}
+      --http
+      --http.addr 0.0.0.0
+      --http.port 8545
+      --http.corsdomain "*"
+      --http.api "{{ geth_http_apis }}"
+      --ws
+      --ws.addr 0.0.0.0
+      --ws.port 8546
+      --ws.origins "*"
+      --ws.api "{{ geth_ws_apis }}"
+      {{ geth_extra_args }}
+    log_driver: json-file
+    log_options:
+      max-size: "{{ geth_log_max_size }}"
+      max-file: "{{ geth_log_max_files }}"
+    env:
+      GETH_VERBOSITY: "{{ geth_verbosity }}"
+
+- name: Wait for Geth to start
+  wait_for:
+    port: "{{ geth_http_port }}"
+    host: "{{ ansible_default_ipv4.address }}"
+    delay: 30
+    timeout: 300
+
+- name: Check Geth sync status
+  uri:
+    url: "http://{{ ansible_default_ipv4.address }}:{{ geth_http_port }}"
+    method: POST
+    body_format: json
+    body:
+      jsonrpc: "2.0"
+      method: "eth_syncing"
+      id: 1
+    headers:
+      Content-Type: "application/json"
+  register: sync_status
+  retries: 3
+  delay: 10
+  when: geth_check_sync_status
+
+- name: Display access information (public)
+  debug:
+    msg:
+      - "Geth node deployed successfully!"
+      - "P2P Port: {{ geth_p2p_port }}"
+      - "HTTP RPC: http://{{ ansible_default_ipv4.address }}:{{ geth_http_port }}"
+      - "WebSocket: ws://{{ ansible_default_ipv4.address }}:{{ geth_ws_port }}"
+      - "⚠️  WARNING: RPC endpoints are publicly accessible!"
+      - ""
+      - "Test connection:"
+      - "curl -X POST -H 'Content-Type: application/json' --data '{\"jsonrpc\":\"2.0\",\"method\":\"eth_blockNumber\",\"id\":1}' http://{{ ansible_default_ipv4.address }}:{{ geth_http_port }}"
+  when: geth_enable_public_access
+
+- name: Display access information (local)
+  debug:
+    msg:
+      - "Geth node deployed successfully!"
+      - "P2P Port: {{ geth_p2p_port }}"
+      - "HTTP RPC: http://localhost:{{ geth_http_port }} (local only)"
+      - "WebSocket: ws://localhost:{{ geth_ws_port }} (local only)"
+      - ""
+      - "Test connection:"
+      - "curl -X POST -H 'Content-Type: application/json' --data '{\"jsonrpc\":\"2.0\",\"method\":\"eth_blockNumber\",\"id\":1}' http://localhost:{{ geth_http_port }}"
+  when: not geth_enable_public_access

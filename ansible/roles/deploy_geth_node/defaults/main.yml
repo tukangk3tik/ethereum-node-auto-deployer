@@ -1,0 +1,37 @@
+#SPDX-License-Identifier: MIT-0
+---
+# defaults file for roles/deploy_geth_node
+
+# Geth Docker configuration
+geth_image: ethereum/client-go
+geth_tag: latest
+geth_container_name: geth-snap
+
+# Storage configuration
+geth_data_dir: /opt/ethereum-data
+
+# Network configuration
+geth_p2p_port: 30303
+geth_http_port: 8545
+geth_ws_port: 8546
+
+# Security configuration
+geth_enable_public_access: true  # Set to true to enable public RPC access
+
+# Sync configuration
+geth_sync_mode: snap
+geth_cache_size: 2048
+geth_max_peers: 25
+
+# API configuration
+geth_http_apis: "eth,net,web3"
+geth_ws_apis: "eth,net,web3"
+
+# Logging configuration
+geth_verbosity: "3"
+geth_log_max_size: "100m"
+geth_log_max_files: "3"
+
+# Additional options
+geth_extra_args: ""
+geth_check_sync_status: true

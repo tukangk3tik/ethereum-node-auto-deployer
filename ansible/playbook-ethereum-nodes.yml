@@ -1,0 +1,10 @@
+- name: Deploy Geth Node
+  hosts: ethereum-nodes
+  become: yes
+  roles:
+    - role: deploy_geth_node
+      vars:
+        geth_sync_mode: snap
+        geth_data_dir: /data/ethereum
+        geth_http_port: 8545
+        geth_extra_args: "--metrics --metrics.addr 0.0.0.0"

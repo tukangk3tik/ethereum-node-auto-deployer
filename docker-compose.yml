@@ -1,0 +1,55 @@
+# This docker-compose.yml is used to run geth-light container for testing purpose
+version: '3.8'
+
+services:
+  geth-light:
+    image: ethereum/client-go:latest
+    container_name: geth-light
+    restart: unless-stopped
+    command: >
+      --syncmode snap
+      --state.scheme path
+      --cache 2048
+      --gcmode archive
+      --cache.preimages=false
+      --sepolia
+      --maxpeers 25
+      --http
+      --http.addr 0.0.0.0
+      --http.port 8545
+      --http.corsdomain "*"
+      --http.api "eth,net,web3"
+      --ws
+      --ws.addr 0.0.0.0
+      --ws.port 8546
+      --ws.origins "*"
+      --ws.api "eth,net,web3"
+    ports:
+      - "8545:8545"  # HTTP RPC
+      - "8546:8546"  # WebSocket RPC
+      - "30303:30303"  # P2P networking
+      - "30303:30303/udp"  # P2P networking UDP
+    volumes:
+      - ethereum_data:/root/.ethereum
+      - ./logs:/var/log/geth
+    environment:
+      - GETH_VERBOSITY=3
+    networks:
+      - ethereum
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "3"
+
+volumes:
+  ethereum_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./host/ethereum-data
+
+networks:
+  ethereum:
+    driver: bridge
