@@ -2,6 +2,19 @@
 version: '3.8'
 
 services:
+  mongo:
+    image: mongo:4.2.3
+    container_name: mongo-4.2.3
+    restart: "no"
+    ports:
+      - 27017:27017
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: ethNodeDeployer2025
+      MONGO_INITDB_DATABASE: eth_node_deployer
+    volumes:
+      - ./_data-mongo:/data/db
+
   geth-light:
     image: ethereum/client-go:latest
     container_name: geth-light

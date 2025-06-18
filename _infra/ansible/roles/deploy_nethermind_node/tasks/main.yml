@@ -1,0 +1,106 @@
+#SPDX-License-Identifier: MIT-0
+---
+# tasks file for roles/deploy_nethermind_node
+
+- name: Create Nethermind data directory
+  file:
+    path: "{{ nethermind_data_dir }}"
+    state: directory
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0755'
+
+- name: Check if Nethermind container is already running
+  docker_container_info:
+    name: "{{ nethermind_container_name }}"
+  register: nethermind_container_info
+  ignore_errors: yes
+
+- name: Stop existing Nethermind container if running
+  docker_container:
+    name: "{{ nethermind_container_name }}"
+    state: stopped
+  when: nethermind_container_info.exists and nethermind_container_info.container.State.Status == "running"
+
+- name: Remove existing Nethermind container if exists
+  docker_container:
+    name: "{{ nethermind_container_name }}"
+    state: absent
+  when: nethermind_container_info.exists
+
+- name: Pull Nethermind Docker image
+  docker_image:
+    name: "{{ nethermind_image }}"
+    source: pull
+    tag: "{{ nethermind_tag }}"
+
+- name: Create Nethermind configuration directory
+  file:
+    path: "{{ nethermind_config_dir }}"
+    state: directory
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0755'
+
+- name: Create Nethermind configuration file
+  template:
+    src: config.j2
+    dest: "{{ nethermind_config_dir }}/config.cfg"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0644'
+
+- name: Run Nethermind node container
+  docker_container:
+    name: "{{ nethermind_container_name }}"
+    image: "{{ nethermind_image }}:{{ nethermind_tag }}"
+    state: started
+    restart_policy: always
+    ports:
+      - "{{ nethermind_p2p_port }}:30303"
+      - "{{ nethermind_p2p_port }}:30303/udp"
+      - "{{ nethermind_http_port if nethermind_enable_public_access else '127.0.0.1:' + nethermind_http_port|string }}:8545"
+      - "{{ nethermind_ws_port if nethermind_enable_public_access else '127.0.0.1:' + nethermind_ws_port|string }}:8546"
+    volumes:
+      - "{{ nethermind_data_dir }}:/nethermind/nethermind_db"
+      - "{{ nethermind_config_dir }}:/nethermind/configs"
+    command: --config /nethermind/configs/config.cfg
+    log_driver: json-file
+    log_options:
+      max-size: "{{ nethermind_log_max_size }}"
+      max-file: "{{ nethermind_log_max_files }}"
+    env:
+      NETHERMIND_LOG_LEVEL: "{{ nethermind_log_level }}"
+
+- name: Wait for Nethermind to start
+  wait_for:
+    port: "{{ nethermind_http_port }}"
+    host: "{{ ansible_default_ipv4.address }}"
+    delay: 30
+    timeout: 300
+
+- name: Check Nethermind sync status
+  uri:
+    url: "http://{{ ansible_default_ipv4.address }}:{{ nethermind_http_port }}"
+    method: POST
+    body_format: json
+    body:
+      jsonrpc: "2.0"
+      method: "eth_syncing"
+      id: 1
+    headers:
+      Content-Type: "application/json"
+  register: sync_status
+  retries: 3
+  delay: 10
+  when: nethermind_check_sync_status
+
+- name: Display access information
+  debug:
+    msg:
+      - "Nethermind node deployed successfully!"
+      - "P2P Port: {{ nethermind_p2p_port }}"
+      - "HTTP RPC: http://{{ ansible_default_ipv4.address }}:{{ nethermind_http_port }}"
+      - "WebSocket: ws://{{ ansible_default_ipv4.address }}:{{ nethermind_ws_port }}"
+      - "Data directory: {{ nethermind_data_dir }}"
+      - "Configuration directory: {{ nethermind_config_dir }}"

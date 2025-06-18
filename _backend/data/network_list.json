@@ -1,0 +1,14 @@
+[
+  {
+    "id": "sepolia",
+    "name": "Sepolia"
+  },
+  {
+    "id": "mainnet",
+    "name": "Mainnet"
+  },
+  {
+    "id": "goerli",
+    "name": "Goerli (Deprecated)"
+  }
+]

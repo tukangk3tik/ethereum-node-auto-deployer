@@ -1,0 +1,77 @@
+#SPDX-License-Identifier: MIT-0
+---
+# defaults file for roles/deploy_nethermind_node
+
+# Nethermind Docker configuration
+nethermind_image: nethermind/nethermind
+nethermind_tag: latest
+nethermind_container_name: nethermind
+
+# Storage configuration
+nethermind_data_dir: /opt/nethermind-data
+nethermind_config_dir: /etc/nethermind
+
+# Network configuration
+nethermind_p2p_port: 30303
+nethermind_http_port: 8545
+nethermind_ws_port: 8546
+nethermind_enable_public_access: false
+
+# Sync configuration
+nethermind_sync_mode: "Fast"  # Options: Fast, FastBlocks, Full, Beam, Snap, None
+nethermind_fast_sync: true
+nethermind_fast_blocks: true
+nethermind_download_bodies_in_fast_sync: true
+nethermind_download_receipts_in_fast_sync: true
+nethermind_use_priority_peers: true
+nethermind_pivot_number: 0  # 0 = auto, or specify a block number
+
+# JSON-RPC configuration
+nethermind_enable_unsecured_dev_wallet: false
+nethermind_enable_unsecured_dev_when_no_producer: false
+nethermind_http_enabled: true
+nethermind_http_host: "0.0.0.0"
+nethermind_http_port: 8545
+nethermind_ws_enabled: true
+nethermind_ws_host: "0.0.0.0"
+nethermind_ws_port: 8546
+nethermind_engine_host: "0.0.0.0"
+nethermind_engine_port: 8551
+nethermind_json_rpc_enabled: true
+nethermind_json_rpc_host: "0.0.0.0"
+nethermind_json_rpc_port: 8545
+
+# API configuration
+nethermind_http_modules:
+  - "Eth"
+  - "Net"
+  - "Web3"
+  - "Debug"
+  - "Trace"
+  - "TxPool"
+  - "Parity"
+  - "Health"
+  - "Rpc"
+
+nethermind_ws_modules:
+  - "Eth"
+  - "Net"
+  - "Web3"
+  - "Debug"
+  - "Trace"
+  - "TxPool"
+  - "Parity"
+  - "Health"
+  - "Rpc"
+
+# Logging configuration
+nethermind_log_level: "Info"  # Options: Trace, Debug, Info, Warn, Error, Off
+nethermind_log_max_size: "100m"
+nethermind_log_max_files: "3"
+
+# Additional options
+nethermind_metrics_enabled: false
+nethermind_metrics_host: "0.0.0.0"
+nethermind_metrics_port: 6060
+nethermind_metrics_interval_seconds: 5
+nethermind_check_sync_status: true
