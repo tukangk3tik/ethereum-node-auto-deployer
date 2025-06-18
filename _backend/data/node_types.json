@@ -1,0 +1,14 @@
+[
+  {
+    "id": "geth",
+    "name": "Geth"
+  },
+  {
+    "id": "nethermind",
+    "name": "Nethermind"
+  },
+  {
+    "id": "erigon",
+    "name": "Erigon"
+  }
+]
