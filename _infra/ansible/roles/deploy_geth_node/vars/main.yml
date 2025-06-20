@@ -11,6 +11,7 @@ required_packages:
 
 # Network definitions
 geth_networks:
-  mainnet: ""
+  mainnet: "--mainnet"
   sepolia: "--sepolia"
-  goerli: "--goerli"
+  holesky: "--holesky"
+  hoodie: "--hoodie"

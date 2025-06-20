@@ -25,6 +25,12 @@ A modern and lightweight dashboard built with **React** for monitoring and manag
 | Data Store | MongoDB |
 | Auth | JWT |
 
+## 🛜 Tested Deployed Network
+
+| Network | Mainnet | Sepolia | Holesky | Hoodie | Goerli |
+|--------------|---------|---------|---------|--------|--------|
+| Geth     | ✅ | ✅ | ✅ | ❌ | ❌ |
+
 ---
 
 ## 📁 Project Structure

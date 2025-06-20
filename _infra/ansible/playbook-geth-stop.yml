@@ -1,0 +1,26 @@
+- name: Stop and Remove Geth Node Container
+  hosts: all
+  become: yes
+  gather_facts: false
+  vars:
+    geth_container_name: "{{ GETH_CONTAINER_NAME }}"
+
+  tasks:
+    - name: Stop Geth Container
+      docker_container:
+        name: "{{ geth_container_name }}"
+        state: stopped
+
+    - name: Verify container is stopped
+      docker_container_info:
+        name: "{{ geth_container_name }}"
+      register: container_info
+
+    - name: Remove Geth container
+      docker_container:
+        name: "{{ geth_container_name }}"
+        state: absent
+    
+    - name: Display container status
+      debug:
+        msg: "Container {{ geth_container_name }} status: {{ container_info.container.State.Status | default('not found') }}"

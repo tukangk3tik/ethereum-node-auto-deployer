@@ -23,13 +23,12 @@ dist-ssr
 *.sln
 *.sw?
 
-host
-logs/**
+**/host/**
+**/logs/**
 
-!logs/.gitkeep
-!logs/README.md
+**/!logs/.gitkeep
+**/!logs/README.md
 
-_infra/ansible/inventory.ini
 _data-mongo
 
 .env
