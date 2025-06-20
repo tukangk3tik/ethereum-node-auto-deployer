@@ -1,0 +1,22 @@
+- name: Deploy Geth Node
+  hosts: all
+  become: yes
+  gather_facts: false
+
+  tasks:
+    - name: Gather network facts
+      setup:
+        gather_subset:
+          - network
+  
+  roles:
+    - role: deploy_geth_node
+      vars:
+        geth_sync_mode: snap
+        geth_data_dir: /data/ethereum
+        geth_http_port: "{{ GETH_HTTP_PORT }}"
+        geth_ws_port: "{{ GETH_WS_PORT }}"
+        geth_p2p_port: "{{ GETH_P2P_PORT }}"
+        geth_network: "{{ GETH_NETWORK }}"
+        geth_container_name: "{{ GETH_CONTAINER_NAME }}"
+        geth_extra_args: "--metrics --metrics.addr 0.0.0.0 --metrics.port 6060"

@@ -1,6 +1,12 @@
 
 # Skipping docker setup
 # Ensure the docker was installed in remote host
+
+- name: Validate network selection
+  fail:
+    msg: "Invalid network '{{ geth_network }}'. Valid options are: {{ geth_networks.keys() | list | join(', ') }}"
+  when: geth_network not in geth_networks.keys()
+
 - name: Create Ethereum data directory
   file:
     path: "{{ geth_data_dir }}"
@@ -46,7 +52,8 @@
       - "{{ geth_ws_port if geth_enable_public_access else '127.0.0.1:' + geth_ws_port|string }}:8546"
     volumes:
       - "{{ geth_data_dir }}:/root/.ethereum"
-    command: >
+    command: >-
+      {{ geth_networks[geth_network | default('mainnet')] }}
       --syncmode {{ geth_sync_mode }}
       --state.scheme path
       --cache {{ geth_cache_size }}
@@ -72,13 +79,13 @@
 - name: Wait for Geth to start
   wait_for:
     port: "{{ geth_http_port }}"
-    host: "{{ ansible_default_ipv4.address }}"
+    host: "{{ ansible_default_ipv4.address | default('0.0.0.0') }}"
     delay: 30
     timeout: 300
 
 - name: Check Geth sync status
   uri:
-    url: "http://{{ ansible_default_ipv4.address }}:{{ geth_http_port }}"
+    url: "http://{{ ansible_default_ipv4.address | default('0.0.0.0') }}:{{ geth_http_port }}"
     method: POST
     body_format: json
     body:
@@ -97,12 +104,12 @@
     msg:
       - "Geth node deployed successfully!"
       - "P2P Port: {{ geth_p2p_port }}"
-      - "HTTP RPC: http://{{ ansible_default_ipv4.address }}:{{ geth_http_port }}"
-      - "WebSocket: ws://{{ ansible_default_ipv4.address }}:{{ geth_ws_port }}"
+      - "HTTP RPC: http://{{ ansible_default_ipv4.address | default('0.0.0.0') }}:{{ geth_http_port }}"
+      - "WebSocket: ws://{{ ansible_default_ipv4.address | default('0.0.0.0') }}:{{ geth_ws_port }}"
       - "⚠️  WARNING: RPC endpoints are publicly accessible!"
       - ""
       - "Test connection:"
-      - "curl -X POST -H 'Content-Type: application/json' --data '{\"jsonrpc\":\"2.0\",\"method\":\"eth_blockNumber\",\"id\":1}' http://{{ ansible_default_ipv4.address }}:{{ geth_http_port }}"
+      - "curl -X POST -H 'Content-Type: application/json' --data '{\"jsonrpc\":\"2.0\",\"method\":\"eth_blockNumber\",\"id\":1}' http://{{ ansible_default_ipv4.address | default('0.0.0.0') }}:{{ geth_http_port }}"
   when: geth_enable_public_access
 
 - name: Display access information (local)
