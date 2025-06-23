@@ -101,25 +101,10 @@
 
 - name: Display access information (public)
   debug:
-    msg:
-      - "Geth node deployed successfully!"
-      - "P2P Port: {{ geth_p2p_port }}"
-      - "HTTP RPC: http://{{ ansible_default_ipv4.address | default('0.0.0.0') }}:{{ geth_http_port }}"
-      - "WebSocket: ws://{{ ansible_default_ipv4.address | default('0.0.0.0') }}:{{ geth_ws_port }}"
-      - "⚠️  WARNING: RPC endpoints are publicly accessible!"
-      - ""
-      - "Test connection:"
-      - "curl -X POST -H 'Content-Type: application/json' --data '{\"jsonrpc\":\"2.0\",\"method\":\"eth_blockNumber\",\"id\":1}' http://{{ ansible_default_ipv4.address | default('0.0.0.0') }}:{{ geth_http_port }}"
+    msg: "[DEPLOY_SUCCESS] Geth Node deployed successfully! P2P Port: {{ geth_p2p_port }} HTTP RPC: http://localhost:{{ geth_http_port }} (local only) WebSocket: ws://localhost:{{ geth_ws_port }} (local only) Test connection: curl -X POST -H 'Content-Type: application/json' --data '{\"jsonrpc\":\"2.0\",\"method\":\"eth_blockNumber\",\"id\":1}' http://localhost:{{ geth_http_port }}"
   when: geth_enable_public_access
 
 - name: Display access information (local)
   debug:
-    msg:
-      - "Geth node deployed successfully!"
-      - "P2P Port: {{ geth_p2p_port }}"
-      - "HTTP RPC: http://localhost:{{ geth_http_port }} (local only)"
-      - "WebSocket: ws://localhost:{{ geth_ws_port }} (local only)"
-      - ""
-      - "Test connection:"
-      - "curl -X POST -H 'Content-Type: application/json' --data '{\"jsonrpc\":\"2.0\",\"method\":\"eth_blockNumber\",\"id\":1}' http://localhost:{{ geth_http_port }}"
+    msg: "[DEPLOY_SUCCESS] Geth Node deployed successfully! P2P Port: {{ geth_p2p_port }} HTTP RPC: http://localhost:{{ geth_http_port }} (local only) WebSocket: ws://localhost:{{ geth_ws_port }} (local only) Test connection: curl -X POST -H 'Content-Type: application/json' --data '{\"jsonrpc\":\"2.0\",\"method\":\"eth_blockNumber\",\"id\":1}' http://localhost:{{ geth_http_port }}"
   when: not geth_enable_public_access

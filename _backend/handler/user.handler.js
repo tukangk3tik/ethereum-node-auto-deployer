@@ -21,7 +21,7 @@ export const userLogin = async (_req, reply) => {
       });
     }
 
-    const token = jwt.sign({ email: fetchedUser.email }, process.env.JWT_KEY, {
+    const token = jwt.sign({ email: fetchedUser.email, _id: fetchedUser._id, name: fetchedUser.name }, process.env.JWT_KEY, {
       expiresIn: process.env.JWT_EXPIRED,
     });
 
