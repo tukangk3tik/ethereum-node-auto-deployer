@@ -10,5 +10,13 @@
   {
     "id": "goerli",
     "name": "Goerli (Deprecated)"
+  },
+  {
+    "id": "holesky",
+    "name": "Holesky"
+  },
+  {
+    "id": "hoodie",
+    "name": "Hoodie"
   }
 ]
