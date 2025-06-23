@@ -23,4 +23,4 @@
     
     - name: Display container status
       debug:
-        msg: "Container {{ geth_container_name }} status: {{ container_info.container.State.Status | default('not found') }}"
+        msg: "[STOP_SUCCESS] Geth Node stopped successfully! Container {{ geth_container_name }} status: {{ container_info.container.State.Status | default('not found') }}"

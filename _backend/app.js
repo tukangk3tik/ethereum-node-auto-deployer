@@ -4,6 +4,7 @@ import masterDataRoutes from './routes/master-data.route.js';
 import userRoutes from './routes/user.route.js';
 import ethNodeRoutes from './routes/eth-node.route.js';
 import connectDB from './config/db.js';
+import setupProject from './setup-project.js';
 import cors from '@fastify/cors';
 
 const fastify = Fastify({
@@ -11,6 +12,9 @@ const fastify = Fastify({
 });
 
 async function buildApp() {
+  // setup project here
+  await setupProject();
+
   // connect db here
   await connectDB();
 
