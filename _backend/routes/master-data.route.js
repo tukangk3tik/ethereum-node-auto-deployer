@@ -1,12 +1,11 @@
 import { getListNetwork, getListNodeTypes } from "../handler/master-data.handler.js";
 
 async function routes(fastify) {
-  fastify.get("/master-data/node-types", {
+  fastify.get("/master/client-type", {
     handler: getListNodeTypes,
   });
 
-  fastify.get("/master-data/networks", {
-    preHandler: fastify.auth,
+  fastify.get("/master/network", {
     handler: getListNetwork,
   });
 }

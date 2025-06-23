@@ -6,6 +6,7 @@ import ethNodeRoutes from './routes/eth-node.route.js';
 import connectDB from './config/db.js';
 import setupProject from './setup-project.js';
 import cors from '@fastify/cors';
+import seeder from './seeder.js';
 
 const fastify = Fastify({
   logger: true
@@ -17,6 +18,9 @@ async function buildApp() {
 
   // connect db here
   await connectDB();
+
+  // seeding here
+  await seeder();
 
   fastify.get('/', async () => {
     return 'ETH Node Deployer API - v1';
