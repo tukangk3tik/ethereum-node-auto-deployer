@@ -1,4 +1,5 @@
 import Fastify from 'fastify';
+import fastifyMultipart from '@fastify/multipart';
 import authPlugin from './plugins/auth.js';
 import masterDataRoutes from './routes/master-data.route.js';
 import userRoutes from './routes/user.route.js';
@@ -33,6 +34,11 @@ async function buildApp() {
     allowedHeaders: ['Content-Type', 'Authorization'],
     exposedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
+  });
+  await fastify.register(fastifyMultipart, {
+    limits: {
+      fileSize: 10 * 1024 * 1024, // 10 MB
+    },
   });
   fastify.register(authPlugin);
   fastify.register(masterDataRoutes);

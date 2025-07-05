@@ -1,5 +1,5 @@
 export interface RequestHeaders {
-  'Content-Type': string;
+  'Content-Type'?: string;
   Authorization?: string;
   [key: string]: string | undefined;
 }

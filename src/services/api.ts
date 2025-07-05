@@ -2,6 +2,10 @@ import { BadRequestError } from '../types/error';
 import { RequestHeaders } from '../types/header';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
+export const requestContentType = {
+  'json': 'application/json',
+  'multipart': 'multipart/form-data',
+};
 
 // Helper function to get auth header
 const getAuthHeader = () => {
@@ -14,19 +18,33 @@ export async function apiRequest<T>(
   endpoint: string,
   method: string = 'GET',
   data?: any,
-  requiresAuth: boolean = true
+  requiresAuth: boolean = true,
+  contentType = requestContentType.json,
+  isMultipart: boolean = false,
 ): Promise<T> {
   const url = `${API_BASE_URL}${endpoint}`;
   
   const headers: RequestHeaders = {
-    'Content-Type': 'application/json',
     ...(requiresAuth ? getAuthHeader() : {})
   };
+  if (!isMultipart) {
+    headers['Content-Type'] = contentType;
+  }
+
+  let body: any = undefined;
+  if (data) {
+    if (isMultipart) {
+      delete headers['Content-Type'];
+      body = data;
+    } else {
+      body = JSON.stringify(data);
+    }
+  }
 
   const config: RequestInit = {
     method: method,
     headers: headers as HeadersInit,
-    body: data ? JSON.stringify(data) : undefined,
+    body: body,
   };
 
   const response = await fetch(url, config);

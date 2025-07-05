@@ -32,3 +32,5 @@ dist-ssr
 _data-mongo
 
 .env
+**/.temp/**
+!**/.temp/.gitkeep

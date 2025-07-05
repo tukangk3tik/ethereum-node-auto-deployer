@@ -27,21 +27,21 @@ export function AuthProvider({ children }: AuthProviderProps) {
     isAuthenticated: false,
     user: null,
     accessToken: null,
-    refreshToken: null,
+    expiresIn: null,
   });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     // Check if user is already logged in
     const storedAccessToken = localStorage.getItem('access_token');
-    const storedRefreshToken = localStorage.getItem('refresh_token');
+    const storedExpiresIn = localStorage.getItem('expires_in');
     
-    if (storedAccessToken && storedRefreshToken) {
+    if (storedAccessToken) {
       setAuthState({
         isAuthenticated: true,
         user: null, // We'll need to fetch user info in a real app
         accessToken: storedAccessToken,
-        refreshToken: storedRefreshToken,
+        expiresIn: storedExpiresIn,
       });
     }
     
@@ -55,8 +55,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
       const response = await apiLoginUser<LoginResponse>(email, password);
         
       // Store tokens
-      localStorage.setItem('access_token', response.data.access_token);
-      localStorage.setItem('refresh_token', response.data.refresh_token);
+      localStorage.setItem('access_token', response.data.token);
+      // localStorage.setItem('refresh_token', response.data.refresh_token);
         
       // In a real app, you would fetch user info here
       // const userInfo = await fetchUserInfo();
@@ -64,8 +64,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
       setAuthState({
         isAuthenticated: true,
         user: null, // Replace with userInfo in a real app
-        accessToken: response.data.access_token,
-        refreshToken: response.data.refresh_token,
+        accessToken: response.data.token,
+        expiresIn: response.data.expiresIn,
       });
     } catch (error) {
       throw error;
@@ -80,7 +80,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       isAuthenticated: false,
       user: null,
       accessToken: null,
-      refreshToken: null,
+      expiresIn: null,
     });
   };
 

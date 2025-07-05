@@ -1,7 +1,7 @@
 import React, { ButtonHTMLAttributes } from 'react';
 
-type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'danger' | 'success';
-type ButtonSize = 'sm' | 'md' | 'lg';
+type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'danger' | 'success' | 'warning' | 'white';
+type ButtonSize = 'sm' | 'md' | 'lg' | 'xs';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant;
@@ -9,7 +9,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   isLoading?: boolean;
   fullWidth?: boolean;
   icon?: React.ReactNode;
-  iconPosition?: 'left' | 'right';
+  iconPosition?: 'left' | 'right' | 'none';
 }
 
 const Button: React.FC<ButtonProps> = ({
@@ -25,10 +25,11 @@ const Button: React.FC<ButtonProps> = ({
   ...props
 }) => {
   // Base classes for all buttons
-  const baseClasses = 'inline-flex items-center justify-center font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors';
+  const baseClasses = 'inline-flex items-center justify-center font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors';
   
   // Size classes
   const sizeClasses = {
+    xs: 'px-1 py-1 text-xs',
     sm: 'px-3 py-1.5 text-xs',
     md: 'px-4 py-2 text-sm',
     lg: 'px-6 py-3 text-base'
@@ -40,7 +41,9 @@ const Button: React.FC<ButtonProps> = ({
     secondary: 'text-white bg-gray-600 hover:bg-gray-700 focus:ring-gray-500 border border-transparent',
     outline: 'text-indigo-600 bg-transparent hover:bg-indigo-50 focus:ring-indigo-500 border border-indigo-600',
     danger: 'text-white bg-red-600 hover:bg-red-700 focus:ring-red-500 border border-transparent',
-    success: 'text-white bg-green-600 hover:bg-green-700 focus:ring-green-500 border border-transparent'
+    success: 'text-white bg-green-600 hover:bg-green-700 focus:ring-green-500 border border-transparent',
+    warning: 'text-white bg-amber-400 hover:bg-amber-500 focus:ring-amber-300 border border-transparent',
+    white: 'text-black bg-white hover:bg-white focus:ring-white border border-white',
   };
   
   // Width classes
@@ -76,6 +79,7 @@ const Button: React.FC<ButtonProps> = ({
       {...props}
     >
       {isLoading && <LoadingSpinner />}
+      {!isLoading && icon && iconPosition === 'none' && <span>{icon}</span>}
       {!isLoading && icon && iconPosition === 'left' && <span className="mr-2">{icon}</span>}
       {children}
       {!isLoading && icon && iconPosition === 'right' && <span className="ml-2">{icon}</span>}

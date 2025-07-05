@@ -1,11 +1,11 @@
 import { Listbox, ListboxButton, ListboxOption, ListboxOptions, Transition } from "@headlessui/react";
 import { FiChevronDown, FiSearch, FiX } from "react-icons/fi";
 import { Fragment } from "react";
-import { SelectOption, SelectOptionLocationData } from "../types/utils";
+import { SelectOption, SelectSearchOptionData } from "../types/select_option";
 
 
 interface SelectSearchOptionProps {
-  data: SelectOptionLocationData;
+  data: SelectSearchOptionData;
   isDisable: boolean;
   handleChange: (value: SelectOption) => void;
   handleQueryChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -91,12 +91,12 @@ const SelectSearchOption: React.FC<SelectSearchOptionProps> = ({
                 ) : (
                   data.filteredOptions.map((item) => (
                     <ListboxOption
-                      key={item.id}
+                      key={item._id}
                       value={item}
-                      className={({ selected }) =>
-                        `relative cursor-default select-none py-2 pl-3 pr-9 ${
-                          selected ? 'bg-amber-100 text-amber-900' : 'text-gray-900'
-                        }`
+                      className={({ selected, active }) =>
+                        `relative cursor-default select-none py-2 pl-3 pr-9 
+                        ${selected ? 'bg-amber-100 text-amber-900' : 'text-gray-900'}
+                        ${active ? 'bg-gray-100' : ''}`
                       }
                     >
                       {({ selected }) => (
